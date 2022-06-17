@@ -75,7 +75,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)uC-CPU\Win32\Visual_Studio;$(ProjectDir)uC-CPU\Cfg\Template;$(ProjectDir)uC-CPU;$(ProjectDir)uC-LIB;$(ProjectDir)uC-LIB\Cfg\Template;$(ProjectDir)uC-OS2\Source;$(ProjectDir)uC-OS2\Cfg\Template;$(ProjectDir)uC-OS2\Ports\Win32\Visual Studio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)uC-CPU\Win32\Visual_Studio;$(ProjectDir)uC-CPU\Cfg\Template;$(ProjectDir)uC-CPU;$(ProjectDir)uC-LIB;$(ProjectDir)uC-LIB\Cfg\Template;$(ProjectDir)usercode;$(ProjectDir)uC-OS2\Source;$(ProjectDir)uC-OS2\Cfg\Template;$(ProjectDir)uC-OS2\Ports\Win32\Visual Studio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -98,6 +98,11 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)uC-CPU\Win32\Visual_Studio;$(ProjectDir)uC-CPU\Cfg\Template;$(ProjectDir)uC-CPU;$(ProjectDir)uC-LIB;$(ProjectDir)uC-LIB\Cfg\Template;$(ProjectDir)usercode;$(ProjectDir)uC-OS2\Source;$(ProjectDir)uC-OS2\Cfg\Template;$(ProjectDir)uC-OS2\Ports\Win32\Visual Studio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="uc-cpu\cpu_core.c" />
     <ClCompile Include="uc-cpu\win32\visual_studio\cpu_c.c" />
@@ -107,7 +112,7 @@
     <ClCompile Include="uc-lib\lib_str.c" />
     <ClCompile Include="uc-os2\cfg\template\app_hooks.c" />
     <ClCompile Include="uc-os2\ports\win32\visual studio\os_cpu_c.c" />
-    <ClCompile Include="uc-os2\source\main.c" />
+    <ClCompile Include="main.c" />
     <ClCompile Include="uC-OS2\Source\os_core.c" />
     <ClCompile Include="uc-os2\source\os_dbg_r.c" />
     <ClCompile Include="uC-OS2\Source\os_flag.c" />
@@ -120,6 +125,7 @@
     <ClCompile Include="uC-OS2\Source\os_time.c" />
     <ClCompile Include="uC-OS2\Source\os_tmr.c" />
     <ClCompile Include="uc-os2\source\ucos_ii.c" />
+    <ClCompile Include="usercode\edf.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="uc-cpu\cfg\template\cpu_cfg.h" />
@@ -140,6 +146,7 @@
     <ClInclude Include="uc-os2\source\os.h" />
     <ClInclude Include="uC-OS2\Source\os_trace.h" />
     <ClInclude Include="uc-os2\source\ucos_ii.h" />
+    <ClInclude Include="usercode\edf.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
