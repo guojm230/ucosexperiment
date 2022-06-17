@@ -107,7 +107,7 @@
     <ClCompile Include="uc-lib\lib_str.c" />
     <ClCompile Include="uc-os2\cfg\template\app_hooks.c" />
     <ClCompile Include="uc-os2\ports\win32\visual studio\os_cpu_c.c" />
-    <ClCompile Include="uc-os2\source\main.c" />
+    <ClCompile Include="main.c" />
     <ClCompile Include="uC-OS2\Source\os_core.c" />
     <ClCompile Include="uc-os2\source\os_dbg_r.c" />
     <ClCompile Include="uC-OS2\Source\os_flag.c" />
@@ -120,6 +120,7 @@
     <ClCompile Include="uC-OS2\Source\os_time.c" />
     <ClCompile Include="uC-OS2\Source\os_tmr.c" />
     <ClCompile Include="uc-os2\source\ucos_ii.c" />
+    <ClCompile Include="usercode\usercode.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="uc-cpu\cfg\template\cpu_cfg.h" />
@@ -140,6 +141,8 @@
     <ClInclude Include="uc-os2\source\os.h" />
     <ClInclude Include="uC-OS2\Source\os_trace.h" />
     <ClInclude Include="uc-os2\source\ucos_ii.h" />
+    <ClInclude Include="usercode\INCLUDES.H" />
+    <ClInclude Include="usercode\usercode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
