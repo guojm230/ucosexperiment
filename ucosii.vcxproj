@@ -75,7 +75,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)uC-CPU\Win32\Visual_Studio;$(ProjectDir)uC-CPU\Cfg\Template;$(ProjectDir)uC-CPU;$(ProjectDir)uC-LIB;$(ProjectDir)uC-LIB\Cfg\Template;$(ProjectDir)uC-OS2\Source;$(ProjectDir)uC-OS2\Cfg\Template;$(ProjectDir)uC-OS2\Ports\Win32\Visual Studio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)uC-CPU\Win32\Visual_Studio;$(ProjectDir)uC-CPU\Cfg\Template;$(ProjectDir)uC-CPU;$(ProjectDir)uC-LIB;$(ProjectDir)uC-LIB\Cfg\Template;$(ProjectDir)uC-OS2\Source;$(ProjectDir)uC-OS2\Cfg\Template;$(ProjectDir)usercode;$(ProjectDir)uC-OS2\Ports\Win32\Visual Studio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -120,6 +120,7 @@
     <ClCompile Include="uC-OS2\Source\os_time.c" />
     <ClCompile Include="uC-OS2\Source\os_tmr.c" />
     <ClCompile Include="uc-os2\source\ucos_ii.c" />
+    <ClCompile Include="usercode\rm.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="uc-cpu\cfg\template\cpu_cfg.h" />
@@ -140,6 +141,7 @@
     <ClInclude Include="uc-os2\source\os.h" />
     <ClInclude Include="uC-OS2\Source\os_trace.h" />
     <ClInclude Include="uc-os2\source\ucos_ii.h" />
+    <ClInclude Include="usercode\rm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

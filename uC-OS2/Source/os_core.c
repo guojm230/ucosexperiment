@@ -33,6 +33,7 @@
 #ifndef  OS_MASTER_FILE
 #define  OS_GLOBALS
 #include <ucos_ii.h>
+#include "rm.h"
 #endif
 
 /*
@@ -869,6 +870,12 @@ void  OSSchedUnlock (void)
 void  OSStart (void)
 {
     if (OSRunning == OS_FALSE) {
+        //如果就绪任务不为空，直接选中最高优先级的任务开始执行
+        if (PeekRdyQueue() != NULL) {
+            RMCur = PopRdyQueue();
+            TraceRMStart(RMCur);
+            TaskResume(RMCur->prio);
+        }
         OS_SchedNew();                               /* Find highest priority's task priority number   */
         OSPrioCur     = OSPrioHighRdy;
         OSTCBHighRdy  = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
@@ -1004,6 +1011,47 @@ void  OSTimeTick (void)
             ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
             OS_EXIT_CRITICAL();
         }
+
+        OS_ENTER_CRITICAL();
+        RMTask* top_task = NULL;
+        RMTask* next_task = RMCur;
+        RMTask* prev_task = RMCur;
+        //当前任务时间减一
+        if (RMCur != NULL) {
+            RMCur->remain_time--;
+            if (RMCur->remain_time == 0) {
+                InsertWaitQueue(RMCur);
+                OSTaskSuspend(RMCur->prio);
+                RMCur = NULL;
+            }
+        }
+        //将等待队列中到达新周期的任务添加到就绪队列
+        while ((top_task = PeekWaitQueue()) != NULL && OSTime == top_task->next_period) {
+            top_task->remain_time = top_task->compute_time;
+            top_task->next_period += top_task->period;
+            InsertRdyQueue(PopWaitQueue());
+        }
+        //寻找next_task
+        if (RMCur == NULL) {
+            next_task = PopRdyQueue();
+        }
+        else if (PeekRdyQueue() != NULL && PeekRdyQueue()->period < RMCur->period) {
+            //就绪队列中的任务截止时间比当前运行的高
+            InsertRdyQueue(RMCur);
+            next_task = PopRdyQueue();
+            OSTaskSuspend(RMCur->prio);
+        }
+        RMCur = next_task;
+        //恢复对应任务
+        if (next_task != NULL) {
+            OS_TCB* tcb = OSTCBPrioTbl[next_task->prio];
+            if (tcb->OSTCBDly == 0 && tcb->OSTCBEventPtr == NULL) {
+                OSTaskResume(next_task->prio);
+            }
+        }
+        //记录，打印任务切换
+        TraceTaskSwitch(prev_task, next_task);
+        OS_EXIT_CRITICAL();
     }
 }
 
