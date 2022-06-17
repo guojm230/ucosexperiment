@@ -39,7 +39,7 @@
     <ClCompile Include="uc-os2\ports\win32\visual studio\os_cpu_c.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="uc-os2\source\main.c">
+    <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="uc-os2\source\os_dbg_r.c">

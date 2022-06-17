@@ -107,7 +107,7 @@
     <ClCompile Include="uc-lib\lib_str.c" />
     <ClCompile Include="uc-os2\cfg\template\app_hooks.c" />
     <ClCompile Include="uc-os2\ports\win32\visual studio\os_cpu_c.c" />
-    <ClCompile Include="uc-os2\source\main.c" />
+    <ClCompile Include="main.c" />
     <ClCompile Include="uC-OS2\Source\os_core.c" />
     <ClCompile Include="uc-os2\source\os_dbg_r.c" />
     <ClCompile Include="uC-OS2\Source\os_flag.c" />
