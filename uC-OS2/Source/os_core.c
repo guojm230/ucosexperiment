@@ -33,6 +33,7 @@
 #ifndef  OS_MASTER_FILE
 #define  OS_GLOBALS
 #include <ucos_ii.h>
+#include "edf.h"
 #endif
 
 /*
@@ -865,10 +866,15 @@ void  OSSchedUnlock (void)
 *                 d_ Execute the task.
 *********************************************************************************************************
 */
-
 void  OSStart (void)
 {
     if (OSRunning == OS_FALSE) {
+        //如果就绪任务不为空，直接选中最高优先级的任务开始执行
+        if (PeekRdyQueue() != NULL) {
+            EDFCur = PopRdyQueue();
+            TraceEdfStart(EDFCur);
+            TaskResume(EDFCur->prio);
+        }
         OS_SchedNew();                               /* Find highest priority's task priority number   */
         OSPrioCur     = OSPrioHighRdy;
         OSTCBHighRdy  = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
@@ -1004,6 +1010,47 @@ void  OSTimeTick (void)
             ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
             OS_EXIT_CRITICAL();
         }
+        OS_ENTER_CRITICAL();
+        EDFTcb* top_task = NULL;
+        EDFTcb* next_task = EDFCur;
+        EDFTcb* prev_task = EDFCur;
+        //当前任务时间减一
+        if (EDFCur != NULL) {
+            EDFCur->remain_time--;
+            if (EDFCur->remain_time == 0) {
+                InsertWaitQueue(EDFCur);
+                OSTaskSuspend(EDFCur->prio);
+                EDFCur = NULL;
+            }
+        }
+        //将等待队列中到达新周期的任务添加到就绪队列
+        while ((top_task = PeekWaitQueue()) != NULL && OSTime == top_task->next_period) {
+            top_task->remain_time = top_task->compute_time;
+            top_task->abs_dead_line += top_task->period;
+            top_task->next_period += top_task->period;
+            InsertRdyQueue(PopWaitQueue());
+        }
+        //寻找next_task
+        if (EDFCur == NULL) {
+            next_task = PopRdyQueue();
+        }
+        else if(PeekRdyQueue() != NULL && PeekRdyQueue()->abs_dead_line < EDFCur->abs_dead_line) {
+            //就绪队列中的任务截止时间比当前运行的高
+            InsertRdyQueue(EDFCur);
+            next_task = PopRdyQueue();
+            OSTaskSuspend(EDFCur->prio);
+        }
+        EDFCur = next_task;
+        //恢复对应任务
+        if (next_task != NULL) {
+            OS_TCB* tcb = OSTCBPrioTbl[next_task->prio];
+            if (tcb->OSTCBDly == 0 && tcb->OSTCBEventPtr == NULL) {
+                OSTaskResume(next_task->prio);
+            }
+        }
+        //记录，打印任务切换
+        TraceEdfTaskSwitch(prev_task,next_task);
+        OS_EXIT_CRITICAL();
     }
 }
 
@@ -1751,11 +1798,9 @@ void  OS_Sched (void)
 static  void  OS_SchedNew (void)
 {
 #if OS_LOWEST_PRIO <= 63u                        /* See if we support up to 64 tasks                   */
-    INT8U   y;
-
-
-    y             = OSUnMapTbl[OSRdyGrp];
-    OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
+        INT8U   y;
+        y             = OSUnMapTbl[OSRdyGrp];
+        OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
 #else                                            /* We support up to 256 tasks                         */
     INT8U     y;
     OS_PRIO  *ptbl;
