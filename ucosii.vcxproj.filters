@@ -78,6 +78,9 @@
     <ClCompile Include="uC-OS2\Source\os_tmr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="usercode\rm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="uc-cpu\cpu_cache.h">
@@ -132,6 +135,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="uC-OS2\Source\os_trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="usercode\rm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

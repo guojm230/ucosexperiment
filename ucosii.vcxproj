@@ -120,6 +120,7 @@
     <ClCompile Include="uC-OS2\Source\os_time.c" />
     <ClCompile Include="uC-OS2\Source\os_tmr.c" />
     <ClCompile Include="uc-os2\source\ucos_ii.c" />
+    <ClCompile Include="usercode\rm.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="uc-cpu\cfg\template\cpu_cfg.h" />
@@ -140,6 +141,7 @@
     <ClInclude Include="uc-os2\source\os.h" />
     <ClInclude Include="uC-OS2\Source\os_trace.h" />
     <ClInclude Include="uc-os2\source\ucos_ii.h" />
+    <ClInclude Include="usercode\rm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
