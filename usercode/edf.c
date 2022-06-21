@@ -120,7 +120,7 @@ void TaskSuspend(uint8 prio) {
 	if (OSTCBPrioTbl[prio] == NULL)
 		return;
 	OS_ENTER_CRITICAL()
-	OS_TCB* tcb = OSTCBPrioTbl[prio];
+		OS_TCB* tcb = OSTCBPrioTbl[prio];
 	uint8 y = tcb->OSTCBY;
 	OSRdyTbl[y] &= (OS_PRIO)~tcb->OSTCBBitX;                   /* Make task not ready                 */
 	if (OSRdyTbl[y] == 0u) {
