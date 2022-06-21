@@ -20,6 +20,7 @@ int main() {
 		scanf("%d %d %d",&ct,&dead_line,&period);
 		CreateEdfTask(EmptyTask,ct,dead_line, period);
 	}
+	VerifySchedulability();
 	OSStart();
 	return 0;
 }

@@ -7,6 +7,9 @@
 
 #define STACK_SIZE 1024
 
+#define True 1
+#define False 0
+
 EDFTcb* EDFFreeList;
 EDFTcb* EDFCur;
 
@@ -120,7 +123,7 @@ void TaskSuspend(uint8 prio) {
 	if (OSTCBPrioTbl[prio] == NULL)
 		return;
 	OS_ENTER_CRITICAL()
-	OS_TCB* tcb = OSTCBPrioTbl[prio];
+		OS_TCB* tcb = OSTCBPrioTbl[prio];
 	uint8 y = tcb->OSTCBY;
 	OSRdyTbl[y] &= (OS_PRIO)~tcb->OSTCBBitX;                   /* Make task not ready                 */
 	if (OSRdyTbl[y] == 0u) {
@@ -174,6 +177,87 @@ void CreateEdfTask(void (*task)(void*), uint32 ct, uint32 dead_line, uint32 peri
 	OSTaskCreateExt(task, NULL, Stacks[task_count] + STACK_SIZE - 1, prio, task_count, Stacks[task_count], STACK_SIZE, tcb, NULL);
 	task_count++;
 	TaskSuspend(prio);
+}
+
+//获取所有任务周期的最小公倍数
+static uint32 GetLCM() {
+	uint32 max_period = 0;
+	for (int i = 0; i < EDF_MAX_TASKS; i++) {
+		if (EDFRdyQueue[i] == NULL)
+			continue;
+		if (EDFRdyQueue[i]->period > max_period) {
+			max_period = EDFRdyQueue[i]->period;
+		}
+	}
+	outer:
+		for (int i = 0; i < EDF_MAX_TASKS;i++) {
+			if (EDFRdyQueue[i] == NULL)
+				continue;
+			if (max_period % EDFRdyQueue[i]->period != 0) {
+				max_period *= 2;
+				goto outer;
+			}
+		}
+	return max_period;
+}
+
+BOOLEAN VerifySchedulability() {
+	//计算U
+	double U = 0;
+	double L = 0;
+	INT32U H = 0;
+	INT32U min_dead_line = -1;
+	EDFTcb* task = NULL;
+	for (int i = 0; i < EDF_MAX_TASKS;i++) {
+		task = EDFRdyQueue[i];
+		if (task == NULL)
+			continue;
+		U += task->compute_time / (double)(task->period);
+		if (task->dead_line < min_dead_line) {
+			min_dead_line = task->dead_line;
+		}
+	}
+	if (U > 1)
+		return False;
+	//计算L*
+	for (int i = 0; i < EDF_MAX_TASKS;i++) {
+		task = EDFRdyQueue[i];
+		if (task == NULL)
+			continue;
+		L += (task->period - task->dead_line) * (task->compute_time / (double)(task->period)) / (1 - U);
+	}
+	H = GetLCM();
+	if (L < H) {
+		H = (int)L;
+	}
+	//分别结算G(0,L)
+	L = min_dead_line;
+	INT32U l = min_dead_line;
+	INT32U G = 0;
+	INT32U temp = 0;
+	while (l < H) {
+		G = 0;
+		temp = l;
+		for (int i = 0; i < EDF_MAX_TASKS;i++) {
+			task = EDFRdyQueue[i];
+			if (task == NULL)
+				continue;
+			G += (l +task->period-task->dead_line)/task->period * task->compute_time;
+			//寻找下一i时间点
+			INT32U t = task->dead_line;
+			while (t <= l){
+				t += task->period;
+			}
+			if (temp == l || t < temp) {
+				temp = t;
+			}
+		}
+		if (G > l) {
+			return False;
+		}
+		l = temp;
+	}
+	return True;
 }
 
 

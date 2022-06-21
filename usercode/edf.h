@@ -75,6 +75,7 @@ EDFTcb* PopRdyQueue();
 void TaskSuspend(uint8 prio);
 void TaskResume(uint8 prio);
 
+//BOOLEAN VerifySchedulability();
 
 /*
 * 创建Edf调度的任务
