@@ -101,7 +101,7 @@ static BOOLEAN VerifySchedulability() {
 		return False;
 	}
 	
-	return ub <= 2 ||  VerifyResponseTime();
+	return hb <= 2 ||  VerifyResponseTime();
 }
 
 
@@ -166,7 +166,7 @@ void TaskResume(uint8 prio) {
 static RMTask* PopQueue(RMTask** queue, uint32* count, uint32 offset) {
 	if (*count == 0)
 		return NULL;
-	RMTask** result = queue[1];
+	RMTask* result = queue[1];
 	queue[1] = queue[*count];
 	queue[*count] = NULL;
 	(*count)--;
