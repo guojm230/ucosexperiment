@@ -28,6 +28,10 @@ static int rdy_task_count = 0;
 void EdfInit() {
 	//clear
 	EDFCur = NULL;
+
+	task_count = 0;
+	wait_task_count = 0;
+	rdy_task_count = 0;
 	for (int i = 0; i < EDF_MAX_TASKS; i++) {
 		OS_MemClr(EDFTbl + i, sizeof(EDFTcb));
 		EDFWaitQueue[i] = NULL;
@@ -182,6 +186,7 @@ void CreateEdfTask(void (*task)(void*), uint32 ct, uint32 dead_line, uint32 peri
 //获取所有任务周期的最小公倍数
 static uint32 GetLCM() {
 	uint32 max_period = 0;
+	uint32 lcm = 0;
 	for (int i = 0; i < EDF_MAX_TASKS; i++) {
 		if (EDFRdyQueue[i] == NULL)
 			continue;
@@ -189,22 +194,23 @@ static uint32 GetLCM() {
 			max_period = EDFRdyQueue[i]->period;
 		}
 	}
+	lcm = max_period;
 	outer:
 		for (int i = 0; i < EDF_MAX_TASKS;i++) {
 			if (EDFRdyQueue[i] == NULL)
 				continue;
-			if (max_period % EDFRdyQueue[i]->period != 0) {
-				max_period *= 2;
+			if (lcm % EDFRdyQueue[i]->period != 0) {
+				lcm += max_period;
 				goto outer;
 			}
 		}
-	return max_period;
+	return lcm;
 }
 
 BOOLEAN VerifySchedulability() {
 	//计算U
 	double U = 0;
-	double L = 0;
+	double LS = 0;	//L*
 	INT32U H = 0;
 	INT32U min_dead_line = -1;
 	EDFTcb* task = NULL;
@@ -224,38 +230,39 @@ BOOLEAN VerifySchedulability() {
 		task = EDFRdyQueue[i];
 		if (task == NULL)
 			continue;
-		L += (task->period - task->dead_line) * (task->compute_time / (double)(task->period)) / (1 - U);
+		LS += (task->period - task->dead_line) * (task->compute_time / (double)(task->period)) / (1 - U);
 	}
 	H = GetLCM();
-	if (L < H) {
-		H = (int)L;
+	if (LS < H) {
+		H = (int)LS;
 	}
+
 	//分别结算G(0,L)
-	L = min_dead_line;
-	INT32U l = min_dead_line;
-	INT32U G = 0;
+	INT32U L = min_dead_line;	//计算时间点
+	INT32U G = 0;	//G(0,L)的运算结果
+	INT32U next = 0;	//下一个计算的时间点
 	INT32U temp = 0;
-	while (l < H) {
+	while (L < H) {
 		G = 0;
-		temp = l;
+		next = L;
 		for (int i = 0; i < EDF_MAX_TASKS;i++) {
 			task = EDFRdyQueue[i];
 			if (task == NULL)
 				continue;
-			G += (l +task->period-task->dead_line)/task->period * task->compute_time;
-			//寻找下一i时间点
-			INT32U t = task->dead_line;
-			while (t <= l){
-				t += task->period;
+			G += (L + task->period - task->dead_line)/task->period * task->compute_time;
+			//寻找下一个测试时间点
+			temp = task->dead_line;
+			while (temp <= L){
+				temp += task->period;
 			}
-			if (temp == l || t < temp) {
-				temp = t;
+			if (next == L || temp < next) {
+				next = temp;
 			}
 		}
-		if (G > l) {
+		if (G > L) {
 			return False;
 		}
-		l = temp;
+		L = next;
 	}
 	return True;
 }
