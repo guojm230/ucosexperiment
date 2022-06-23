@@ -54,7 +54,7 @@ static int findPrio() {
 static EDFTcb* PopQueue(EDFTcb** queue,uint32* count,uint32 offset) {
 	if (*count == 0)
 		return NULL;
-	EDFTcb** result = queue[1];
+	EDFTcb* result = queue[1];
 	queue[1] = queue[*count];
 	queue[*count] = NULL;
 	(*count)--;
