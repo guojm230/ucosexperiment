@@ -22,7 +22,7 @@ input_task:
 		CreateEdfTask(EmptyTask,ct,dead_line, period);
 	}
 	if (!VerifySchedulability()) {
-		printf("不可用EDF调度");
+		printf("不可用EDF调度,请重新输入\n");
 		goto input_task;
 	}
 	OSStart();
